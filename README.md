@@ -197,3 +197,66 @@ My_RG                      westcentralus  HA-AP-FGT-02                VM running
 
 Total VMs:  2
 ```
+
+### AWS
+AWS storage utilization and VM instance information gathering for FortiCWP can be done in AWS Cloudshell utilizing the AWS aws CLI.
+
+#### Storage - AWS CLI
+
+```bash
+aws s3api list-buckets --query "Buckets[].Name" | jq '.[]' | sort | xargs -n1 -IBUCKET bash -c "echo BUCKET; aws s3api list-objects --bucket BUCKET --query 'sum(Contents[].Size || [\`0\`])'" | awk 'BEGIN {print "Bucket Name and Size"} {bn=$1; getline ; bs=$1;print bn": "bs ;bt+=bs} END {printf "Total Size: %.6fGB\n", bt/1024/1024/1024}'
+Bucket Name and Size
+movinalot-bucket1-us-east-1: 1826370
+movinalot-bucket1-us-east-2: 183610
+movinalot-bucket2-us-east-1: 0
+Total Size: 0.001872GB
+```
+
+#### VM List and Count - AWS CLI
+
+To return **all** VMs
+
+```bash
+aws ec2 describe-regions --query 'Regions[].RegionName' | jq '.[]' | sort | xargs -n1 -IREGION bash -c "echo -e REGION; aws ec2 describe-instances --region REGION --query 'Reservations[].Instances[].InstanceId | length(@)'" | awk 'BEGIN {print "Region Name and VM Count"} {rn=$1; getline ; vc=$1;print rn": "vc ;vt+=vc} END {print "Total VMs: " vt}'
+Region Name and VM Count
+ap-northeast-1: 0
+ap-northeast-2: 0
+ap-south-1: 0
+ap-southeast-1: 4
+ap-southeast-2: 0
+ca-central-1: 0
+eu-central-1: 0
+eu-north-1: 0
+eu-west-1: 0
+eu-west-2: 0
+eu-west-3: 0
+sa-east-1: 0
+us-east-1: 0
+us-east-2: 0
+us-west-1: 0
+us-west-2: 40
+Total VMs: 44
+```
+
+To return **all running** VMs
+```bash
+aws ec2 describe-regions --query 'Regions[].RegionName' | jq '.[]' | sort | xargs -n1 -IREGION bash -c "echo -e REGION; aws ec2 describe-instances --region REGION --filters Name=instance-state-name,Values=running --query 'Reservations[].Instances[].InstanceId | length(@)'" | awk 'BEGIN {print "Region Name and VM Count"} {rn=$1; getline ; vc=$1;print rn": "vc ;vt+=vc} END {print "Total Running VMs: " vt}'                        
+Region Name and VM Count
+ap-northeast-1: 0
+ap-northeast-2: 0
+ap-south-1: 0
+ap-southeast-1: 0
+ap-southeast-2: 0
+ca-central-1: 0
+eu-central-1: 0
+eu-north-1: 0
+eu-west-1: 0
+eu-west-2: 0
+eu-west-3: 0
+sa-east-1: 0
+us-east-1: 0
+us-east-2: 0
+us-west-1: 0
+us-west-2: 9
+Total Running VMs: 9
+```
