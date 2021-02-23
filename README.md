@@ -260,3 +260,51 @@ us-west-1: 0
 us-west-2: 9
 Total Running VMs: 9
 ```
+
+### GCP
+GCP storage utilization and VM instance information gathering for FortiCWP can be done in GCP Cloudshell utilizing the GCP gcloud and gsutil CLI.
+
+#### VM List and Count - GCP CLI
+
+To return **all** VMs
+
+```bash
+gcloud compute instances list --format="csv[no-heading](zone.basename())" |  awk -F"-" '{ZONE="";for (i=1;i<=NF-1;i++){ZONE=ZON
+E$i; if (i < NF-1) {ZONE=ZONE"-"}}; ZONES[ZONE]+=1} END {TOTAL=0; for (key in ZONES) {TOTAL+=ZONES[key];print key": " ZONES[key]} print "Total VMs: "TOTAL}'
+us-east4: 6
+asia-south1: 13
+us-central1: 44
+us-west1: 13
+us-west2: 4
+southamerica-east1: 1
+northamerica-northeast1: 1
+europe-west6: 6
+europe-west4: 12
+europe-north1: 6
+europe-west3: 6
+europe-west2: 1
+europe-west1: 17
+asia-southeast2: 6
+asia-southeast1: 7
+asia-northeast1: 3
+us-east1: 13
+Total VMs: 159
+```
+
+To return **all running** VMs
+```bash
+gcloud compute instances list --filter="status=RUNNING" --format="csv[no-heading](zone.basename())" |  awk -F"-" '{ZONE="";for 
+(i=1;i<=NF-1;i++){ZONE=ZONE$i; if (i < NF-1) {ZONE=ZONE"-"}}; ZONES[ZONE]+=1} END {TOTAL=0; print "Region Name and VM Count"; for (key in ZONES) {TOTAL+=ZONES[key];print key
+": " ZONES[key]} print "Total Running VMs: "TOTAL}'
+Region Name and VM Count
+us-central1: 21
+us-west1: 2
+us-west2: 1
+southamerica-east1: 1
+europe-west4: 4
+europe-north1: 2
+europe-west3: 2
+europe-west1: 5
+asia-southeast2: 3
+Total Running VMs: 41
+```
