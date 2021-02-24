@@ -212,7 +212,7 @@ movinalot-bucket2-us-east-1: 0
 Total Size: 0.001872GB
 ```
 
-#### VM List and Count - AWS CLI
+#### VM Region List and Count - AWS CLI
 
 To return **all** VMs
 
@@ -264,47 +264,56 @@ Total Running VMs: 9
 ### GCP
 GCP storage utilization and VM instance information gathering for FortiCWP can be done in GCP Cloudshell utilizing the GCP gcloud and gsutil CLI.
 
-#### VM List and Count - GCP CLI
+#### Storage - GCP CLI
+
+```bash
+gsutil du -shc
+58.48 MiB    gs://agentile-fortios-6-4-1
+1.05 GiB     gs://fortinac-bucket
+148.9 MiB    gs://fortitester
+148.26 MiB   gs://fortitester-146
+110.17 MiB   gs://skc-fortiproxy-gcp
+1.5 GiB      total
+```
+#### VM Region List and Count - GCP CLI
 
 To return **all** VMs
 
 ```bash
-gcloud compute instances list --format="csv[no-heading](zone.basename())" |  awk -F"-" '{ZONE="";for (i=1;i<=NF-1;i++){ZONE=ZON
-E$i; if (i < NF-1) {ZONE=ZONE"-"}}; ZONES[ZONE]+=1} END {TOTAL=0; for (key in ZONES) {TOTAL+=ZONES[key];print key": " ZONES[key]} print "Total VMs: "TOTAL}'
-us-east4: 6
+gcloud compute instances list --format="csv[no-heading](zone.basename())" | awk -F"-" '{zn="";for (i=1;i<=NF-1;i++){zn=zn$i; if (i < NF-1) {zn=zn"-"}}; zns[zn]+=1} END {for (key in zns) {print key": " zns[key]}}' | sort | awk 'BEGIN {print "Region Name and VM Count"} {print $0; vt+=$2} END {print "Total VMs: "vt}'
+Region Name and VM Count
+asia-northeast1: 3
 asia-south1: 13
+asia-southeast1: 7
+asia-southeast2: 6
+europe-north1: 6
+europe-west1: 17
+europe-west2: 1
+europe-west3: 6
+europe-west4: 12
+europe-west6: 6
+northamerica-northeast1: 1
+southamerica-east1: 1
 us-central1: 44
+us-east1: 13
+us-east4: 6
 us-west1: 13
 us-west2: 4
-southamerica-east1: 1
-northamerica-northeast1: 1
-europe-west6: 6
-europe-west4: 12
-europe-north1: 6
-europe-west3: 6
-europe-west2: 1
-europe-west1: 17
-asia-southeast2: 6
-asia-southeast1: 7
-asia-northeast1: 3
-us-east1: 13
 Total VMs: 159
 ```
 
 To return **all running** VMs
 ```bash
-gcloud compute instances list --filter="status=RUNNING" --format="csv[no-heading](zone.basename())" |  awk -F"-" '{ZONE="";for 
-(i=1;i<=NF-1;i++){ZONE=ZONE$i; if (i < NF-1) {ZONE=ZONE"-"}}; ZONES[ZONE]+=1} END {TOTAL=0; print "Region Name and VM Count"; for (key in ZONES) {TOTAL+=ZONES[key];print key
-": " ZONES[key]} print "Total Running VMs: "TOTAL}'
+gcloud compute instances list --filter="status=RUNNING" --format="csv[no-heading](zone.basename())" | awk -F"-" '{zn="";for (i=1;i<=NF-1;i++){zn=zn$i; if (i < NF-1) {zn=zn"-"}}; zns[zn]+=1} END {for (key in zns) {print key": " zns[key]}}' | sort | awk 'BEGIN {print "Region Name and VM Count"} {print $0; vt+=$2} END {print "Total Running VMs: "vt}'
 Region Name and VM Count
+asia-southeast2: 3
+europe-north1: 2
+europe-west1: 5
+europe-west3: 2
+europe-west4: 4
+southamerica-east1: 1
 us-central1: 21
 us-west1: 2
 us-west2: 1
-southamerica-east1: 1
-europe-west4: 4
-europe-north1: 2
-europe-west3: 2
-europe-west1: 5
-asia-southeast2: 3
 Total Running VMs: 41
 ```
