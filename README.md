@@ -121,7 +121,8 @@ When initially starting an Azure Cloudshell session you may need to **Select** a
     ```
 
     > If the name of the Subscription is known the process can be done in one step
-    > az account list --query '[?name == `Subscription One`].id' -o tsv | xargs -n1 -ISUB az account set --subscription SUB
+
+    > `az account list --query '[?name == `Subscription One`].id' -o tsv | xargs -n1 -ISUB az account set --subscription SUB`
 
 ## Azure Storage - PowerShell
 
@@ -141,6 +142,7 @@ Get-AzStorageAccount | Get-AzStorageContainer | Get-AzStorageBlob | Measure-Obje
 Using PowerShell list all the VMs across all Azure Regions (Locations) with VM instance information and provide a total count.
 
 > Note: Get-AzVM **does not** retrieve VMs that are part of an Azure Scale Set. This command will list VMs in a scale set.
+
 > `Get-AzResource -ResourceType Microsoft.Compute/virtualMachineScaleSets | Get-AzVmssVM`
 
 To return **all** VMs
@@ -191,6 +193,7 @@ Total Size: 0.010787GB
 ## Azure VM List and Count - AZ CLI
 
 > Note: az vmss list **does not** retrieve VMs that are part of an Azure Scale Set. This command will list VMs in a scale set.
+
 > `az vmss list --query [].resourceGroupName | jq .[]`
 
 To return **all** VMs
