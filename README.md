@@ -1,15 +1,22 @@
-# Fortinet CWP Scripts and One Line Commands
-Fortinet CWP Scripts and One Line commands are used to pull Storage and information from Cloud accounts in order to dertermine CWP protection requirements.
+# Fortinet FortiCWP Sizing One Line Commands
+[Fortinet](https://www.fortinet.com/) FortiCWP One Line commands are used to gather Storage Utilization and VM instance information/count from provider Clouds in order to determine [FortiCWP](https://www.fortinet.com/products/public-cloud-security/cloud-security-posture-management) protection requirements.
 
-One Line commands presneted in this README are meant to be run from the Cloudshell interface of the respective Cloud provider.
+- One Line commands presented in this README are **meant to be run from the Cloudshell interface** of the respective Cloud provider.
+
+- One Line commands **do not** require the user to install any additional tools. The commands use the utilities **already available** in the provider's **Cloudshell**.
+
+- One Line commands **do not require FortiCWP**, these commands **can be used** to determine Storage Utilization and VM instance information/count for **whatever your purpose** may be. 
 
 ## Cloud Provider One Line commands
+- [Azure](#azure)
+- [AWS](#aws)
+- [GCP](#gcp)
 
-### Azure
+# Azure
 Azure storage utilization and VM instance information gathering for FortiCWP can be done in Azure Cloudshell utilizing either PowerShell or the Azure az CLI.
 
-#### Azure Subscription Selection
-When initially starting a Cloudshell session you may need to Select a specific Subscription if your account has access to more than one Subscription.
+## Azure Subscription Selection
+When initially starting an Azure Cloudshell session you may need to **Select** a specific Subscription if your account has access to more than one Subscription.
 
 - Select Subscription - PowerShell
 
@@ -116,16 +123,25 @@ When initially starting a Cloudshell session you may need to Select a specific S
     > If the name of the Subscription is known the process can be done in one step
     > az account list --query '[?name == `Subscription One`].id' -o tsv | xargs -n1 -ISUB az account set --subscription SUB
 
-#### Storage - PowerShell
+## Azure Storage - PowerShell
 
-```
-Get-AzStorageAccount | Get-AzStorageContainer | Get-AzStorageBlob | Measure-Object -Property Length -Sum | Select-Object @{Name="MB";Expression={[math]::round($_.Sum/1MB,2)}}
+Using PowerShell retrieve a total of all the Bytes utilized by all the blobs in all the containers in all the storage accounts across all Azure Regions (Locations). Change the size constant in the calculation for alternate representations of the total size. PowerShell provides these B constants 1KB, 1MB, 1GB, 1TB, 1PB, adjust accordingly
+
+```PowerShell
+Get-AzStorageAccount | Get-AzStorageContainer | Get-AzStorageBlob | Measure-Object -Property Length -Sum | Select-Object @{Name="Total Storage MB";Expression={[math]::round($_.Sum/1MB,2)}}
    MB
    --
 77.85
 ```
 
-#### VM List and Count - PowerShell
+## Azure VM List and Count - PowerShell
+
+### All VMs
+
+Using PowerShell list all the VMs across all Azure Regions (Locations) with VM instance information and provide a total count.
+
+> Note: Get-AzVM **does not** retrieve VMs that are part of an Azure Scale Set. This command will list VMs in a scale set.
+> `Get-AzResource -ResourceType Microsoft.Compute/virtualMachineScaleSets | Get-AzVmssVM`
 
 To return **all** VMs
 ```PowerShell
@@ -148,6 +164,10 @@ MY_RG                     westcentralus UTILITY-RHEL-HOST      VM deallocated   
 Total VMs: 11
 ```
 
+### All Running VMS
+
+Using PowerShell list all the Running VMs across all Azure Regions (Locations) with VM instance information and provide a total count.
+
 To return only **running** VMs
 ```PowerShell
 Get-AzVm -Status | ?{$_.PowerState -eq "VM running"} | Select-Object ResourceGroupName, Location, Name, PowerState -ExpandProperty HardwareProfile | Format-Table; "Total VMs: " + $(Get-AzVM -Status | ?{$_.PowerState -eq "VM running"}).count
@@ -160,11 +180,18 @@ My_RG                     westcentralus HA-AP-FGT-02           VM running       
 Total VMs: 2
 ```
 
-#### Storage - AZ CLI
+## Azure Storage - AZ CLI
 
-***Coming Soon***
+```bash
+az storage account list --query [].name -o tsv | xargs -n1 -ISTOACCT az storage container list --account-name STOACCT --only-show-errors --query '[].{STOACCT:name}' | jq '.[] | to_entries[] | "--account-name "+.key, "--container-name "+.value' | xargs -n2 echo az storage blob list --only-show-errors | awk '{system($0)}' | jq .[].properties.contentLength | awk 'BEGIN {print "Storage Total"} {st+=$1} END {printf "Total Size: %.6fGB\n", st/1024/1024/1024}'
+Storage Total
+Total Size: 0.010787GB
+```
 
-#### VM List and Count - AZ CLI
+## Azure VM List and Count - AZ CLI
+
+> Note: az vmss list **does not** retrieve VMs that are part of an Azure Scale Set. This command will list VMs in a scale set.
+> `az vmss list --query [].resourceGroupName | jq .[]`
 
 To return **all** VMs
 ```bash
@@ -198,21 +225,21 @@ My_RG                      westcentralus  HA-AP-FGT-02                VM running
 Total VMs:  2
 ```
 
-### AWS
-AWS storage utilization and VM instance information gathering for FortiCWP can be done in AWS Cloudshell utilizing the AWS aws CLI.
+# AWS
+AWS storage utilization and VM instance count can be done in AWS Cloudshell utilizing the AWS aws CLI.
 
-#### Storage - AWS CLI
+## AWS Storage - AWS CLI
 
 ```bash
 aws s3api list-buckets --query "Buckets[].Name" | jq '.[]' | sort | xargs -n1 -IBUCKET bash -c "echo BUCKET; aws s3api list-objects --bucket BUCKET --query 'sum(Contents[].Size || [\`0\`])'" | awk 'BEGIN {print "Bucket Name and Size"} {bn=$1; getline ; bs=$1;print bn": "bs ;bt+=bs} END {printf "Total Size: %.6fGB\n", bt/1024/1024/1024}'
 Bucket Name and Size
-movinalot-bucket1-us-east-1: 1826370
-movinalot-bucket1-us-east-2: 183610
-movinalot-bucket2-us-east-1: 0
+bucketname-bucket1-us-east-1: 1826370
+bucketname-bucket1-us-east-2: 183610
+bucketname-bucket2-us-east-1: 0
 Total Size: 0.001872GB
 ```
 
-#### VM Region List and Count - AWS CLI
+## AWS VM Region List and Count - AWS CLI
 
 To return **all** VMs
 
@@ -261,8 +288,8 @@ us-west-2: 9
 Total Running VMs: 9
 ```
 
-### GCP
-GCP storage utilization and VM instance information gathering for FortiCWP can be done in GCP Cloudshell utilizing the GCP gcloud and gsutil CLI.
+# GCP
+GCP storage utilization and VM instance count can be done in GCP Cloudshell utilizing the GCP gcloud and gsutil CLI.
 
 #### Storage - GCP CLI
 
