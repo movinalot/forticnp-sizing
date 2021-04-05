@@ -1,0 +1,1 @@
+Get-AzVm -Status | Where-Object {$_.PowerState -eq "VM running"} | Select-Object ResourceGroupName, Location, Name, PowerState -ExpandProperty HardwareProfile | Format-Table; "Total VMs: " + $(Get-AzVM -Status | Where-Object {$_.PowerState -eq "VM running"}).count

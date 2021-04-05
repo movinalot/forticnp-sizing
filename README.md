@@ -185,7 +185,7 @@ Total VMs: 2
 ## Azure Storage - AZ CLI
 
 ```bash
-az storage account list --query [].name -o tsv | xargs -n1 -ISTOACCT az storage container list --account-name STOACCT --only-show-errors --query '[].{STOACCT:name}' | jq '.[] | to_entries[] | "--account-name "+.key, "--container-name "+.value' | xargs -n2 echo az storage blob list --only-show-errors | awk '{system($0)}' | jq .[].properties.contentLength | awk 'BEGIN {print "Storage Total"} {st+=$1} END {printf "Total Size: %.6fGB\n", st/1024/1024/1024}'
+az storage account list --query [].name -o tsv | xargs -n1 -ISTOACCT az storage container list --account-name STOACCT --only-show-errors --query '[].{STOACCT:name}' | jq '.[] | to_entries[] | "--account-name "+.key, "--container-name "+.value' | xargs -n2 echo az storage blob list --only-show-errors | awk '{system($0)}' | jq .[].properties.contentLength | awk 'BEGIN {print "Storage Total"} {st+=$1} END {printf "Total Size: %.6f GB\n", st/1024/1024/1024}'
 Storage Total
 Total Size: 0.010787GB
 ```
@@ -198,7 +198,7 @@ Total Size: 0.010787GB
 
 To return **all** VMs
 ```bash
-az vm list --show-details --query '[].{ResourceGroupName:resourceGroup, Location:location, Name:name, "PowerState":powerState, VmSize:hardwareProfile.vmSize}' -o table --only-show-errors ; echo " "; echo "Total VMs: " $(az vm list --query '[].name | length([])'--only-show-errors)
+az vm list --show-details --query '[].{ResourceGroupName:resourceGroup, Location:location, Name:name, "PowerState":powerState, VmSize:hardwareProfile.vmSize}' -o table --only-show-errors ; echo " "; echo "Total VMs: " $(az vm list --query '[].name | length([])' --only-show-errors)
 ResourceGroupName          Location       Name                        PowerState      VmSize
 -------------------------  -------------  --------------------------  --------------  ---------------
 RG_01                      eastus         MY_VM                       VM running       Standard_B1s
