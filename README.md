@@ -60,20 +60,18 @@ When initially starting an Azure Cloudshell session you may need to **Select** a
     ```JSON
     az account show
     {
-        {
-            "cloudName": "AzureCloud",
-            "homeTenantId": "22222222-2222-2222-22222-22222222222",
-            "id": "00000000-0000-0000-0000-000000000000",
-            "isDefault": true,
-            "managedByTenants": [],
-            "name": "Subscription Zero",
-            "state": "Enabled",
-            "tenantId": "22222222-2222-2222-22222-22222222222",
-            "user": {
-                "cloudShellID": true,
-                "name": "userid@company.com",
-                "type": "user"
-            }
+        "cloudName": "AzureCloud",
+        "homeTenantId": "22222222-2222-2222-22222-22222222222",
+        "id": "00000000-0000-0000-0000-000000000000",
+        "isDefault": true,
+        "managedByTenants": [],
+        "name": "Subscription Zero",
+        "state": "Enabled",
+        "tenantId": "22222222-2222-2222-22222-22222222222",
+        "user": {
+            "cloudShellID": true,
+            "name": "userid@company.com",
+            "type": "user"
         }
     }
     ```
@@ -292,6 +290,15 @@ Total Running VMs: 9
 ```
 
 # GCP
+
+## GCP Project Selection
+When initially starting a GCP Cloudshell session you need to **Select** a  Project.
+
+- Select Project
+    ```bash
+    gcloud config set project project-name
+    ```
+
 GCP storage utilization and VM instance count can be done in GCP Cloudshell utilizing the GCP gcloud and gsutil CLI.
 
 #### Storage - GCP CLI
