@@ -7,6 +7,9 @@
 
 - One Line commands **do not require FortiCWP**, these commands **can be used** to determine Storage Utilization and VM instance information/count for **whatever your purpose** may be. 
 
+## CWP Sizing in Action
+[![CWP Sizing](https://img.youtube.com/vi/vzbBELbdNNE/0.jpg)](https://www.youtube.com/watch?v=vzbBELbdNNE)
+
 ## Cloud Provider One Line commands
 - [Azure](#azure)
 - [AWS](#aws)
