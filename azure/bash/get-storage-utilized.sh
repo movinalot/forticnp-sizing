@@ -1,1 +1,2 @@
+#!/bin/bash
 az storage account list --query [].name -o tsv | xargs -ISTOACCT az storage container list --account-name STOACCT --only-show-errors --query '[].{STOACCT:name}' | jq '.[] | to_entries[] | "--account-name "+.key, "--container-name "+.value' | xargs -n2 echo az storage blob list --only-show-errors | awk '{system($0)}' | jq .[].properties.contentLength | awk 'BEGIN {print "Storage Total"} {st+=$1} END {printf "Total Size: %.6f GB\n", st/1024/1024/1024}'
