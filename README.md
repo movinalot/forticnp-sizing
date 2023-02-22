@@ -8,10 +8,6 @@
 
 - One Line commands **do not require FortiCNP**, these commands **can be used** to determine Storage Utilization and VM instance information/count for **whatever your purpose** may be.
 
-## FortiCNP Sizing in Action
-
-[![CNP Sizing](https://img.youtube.com/vi/vzbBELbdNNE/0.jpg)](https://www.youtube.com/watch?v=vzbBELbdNNE)
-
 ## Cloud Provider One Line commands
 
 - [Azure](#azure)
