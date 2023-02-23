@@ -54,7 +54,7 @@ When initially starting an Azure Cloudshell session you may need to **Select** a
 1. Select the Subscription
 
     ```PowerShell
-    Select-Subscription -Subscription "Subscription One"
+    Select-AzSubscription -Subscription "Subscription One"
     ```
 
     ```PowerShell
